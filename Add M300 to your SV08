@@ -1,0 +1,110 @@
+SOVOL SVO8 Beep command, M300
+
+Save this as M300.cfg as a text file
+
+Then upload it to Klipper under Machine
+
+######################################################
+
+
+######################################################################
+# M300.cfg
+# M300 S Pitch P duration
+######################################################################
+
+# A BIG Thank You to user: mime
+# BEEPNOTE I=1 DUR=200 FREQ=440  would produce a 440 Hz beep modified to be, one example  M300 S1244 P187
+# REF: https://forum.vorondesign.com/threads/beep-on-fixed-frequency-after-upgrade-to-can.1567/
+
+[gcode_macro M300]
+gcode:
+    # M300 S{pitch in hz} P{duration in ms}
+    {% set S = params.S|default(2000)|int %}    ; Frequency in Hz. Default 2kHz.
+    {% set P = params.P|default(100)|int %}     ; Duration/wait of each beep in ms. Default 100ms
+    SET_PIN PIN=beeper VALUE=0.8 CYCLE_TIME={ 1.0/S if S > 0 else 1 }   ; Turn on beeper sound
+    G4 P{P} ; wait for duration
+    SET_PIN PIN=beeper VALUE=0 ; Turn off beeper sound
+
+
+
+####################################################
+    
+Add this to your printer.cfg file to include the M300.cfg file
+    
+    [include M300.cfg]
+    
+####################################################
+
+To use it in Orcaslicer the End Gcode is, ( two tunes here with a request to play the second one when the Heat Bed reaches 32 degrees )  :-
+
+END_PRINT
+
+M106 P3 S0; Turn OFF Exhaust Fan 100%; PLA allow doors to be closed but open top or for ABS totally closed. Use example PWM   M106 P3 S128 = 50%
+
+; Play Pink Panther
+; M300 S pitch in hz P duration in ms
+; PinkPanther
+M300 S1244 P187
+M300 S1318 P187
+M300 S0 P750
+M300 S1479 P187
+M300 S1567 P187
+M300 S0 P750
+M300 S1244 P187
+M300 S1318 P187
+M300 S0 P93
+M300 S1479 P187
+M300 S1567 P187
+M300 S0 P93
+M300 S2093 P187
+M300 S987 P187
+M300 S0 P93
+M300 S1244 P187
+M300 S1318 P187
+M300 S0 P93
+M300 S987 P187
+M300 S932 P750
+M300 S0 P750
+M300 S880 P93
+M300 S1567 P93
+M300 S1318 P93
+M300 S1174 P93
+M300 S1318 P750
+
+;; Wait for Heat Bed to cool down to 32 C
+;; Part removal Temperature
+
+TEMPERATURE_WAIT SENSOR="heater_bed" MAXIMUM=32 ; Wait till the Build Plate is cool enough to remove the 3D part. Wait until the given temperature sensor is at or above the supplied MINIMUM and/or at or below the supplied MAXIMUM.
+
+M140 S0 ; make sure the bed is turned off.
+
+; Play Indiana
+; M300 S pitch in hz P duration in ms
+; Indiana
+M300 S1318 P240
+M300 S0 P120
+M300 S1396 P120
+M300 S1567 P120
+M300 S0 P120
+M300 S2093 P960
+M300 S0 P120
+M300 S1174 P240
+M300 S0 P120
+M300 S1318 P120
+M300 S1396 P960
+M300 S0 P240
+M300 S1567 P240
+M300 S0 P120
+M300 S880 P120
+M300 S987 P120
+M300 S0 P120
+M300 S2793 P960
+M300 S0 P240
+M300 S880 P240
+M300 S0 P120
+M300 S987 P120
+M300 S2093 P480
+M300 S2349 P480
+M300 S2637 P480
+
+
